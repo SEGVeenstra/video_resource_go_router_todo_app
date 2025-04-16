@@ -7,11 +7,13 @@ class TodoListItem extends StatelessWidget {
     required this.todo,
     required this.onTap,
     required this.onLongPress,
+    required this.onCheck,
   });
 
   final Todo todo;
   final VoidCallback onTap;
   final VoidCallback? onLongPress;
+  final VoidCallback? onCheck;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +26,10 @@ class TodoListItem extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         title: Text(todo.title),
-        trailing: todo.completed ? Icon(Icons.check) : null,
+        trailing: Checkbox(
+          value: todo.completed,
+          onChanged: (_) => onCheck?.call(),
+        ),
       ),
     );
   }

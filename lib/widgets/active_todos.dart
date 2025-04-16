@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:video_resource_go_router_todo_app/data/todos.dart';
+import 'package:video_resource_go_router_todo_app/todo_router.dart';
 import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
 
 enum TabsItems { active, completed }
@@ -68,13 +69,15 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
             children: [
               TodoListView(
                 todos: Todos().active,
-                onTodoTapped: Todos().toggleComplete,
+                onTodoTapped: (todo) => context.todoRouter.goToTodo(todo.id),
                 onTodoLongPressed: Todos().archive,
+                onTodoCheck: Todos().toggleComplete,
               ),
               TodoListView(
                 todos: Todos().completed,
-                onTodoTapped: Todos().toggleComplete,
+                onTodoTapped: (todo) => context.todoRouter.goToTodo(todo.id),
                 onTodoLongPressed: Todos().archive,
+                onTodoCheck: Todos().toggleComplete,
               ),
             ],
           );

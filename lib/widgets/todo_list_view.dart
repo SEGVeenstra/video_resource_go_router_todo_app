@@ -9,11 +9,13 @@ class TodoListView extends StatelessWidget {
     super.key,
     this.onTodoTapped,
     this.onTodoLongPressed,
+    this.onTodoCheck,
     required this.todos,
   });
 
   final TodoListItemCallback? onTodoTapped;
   final TodoListItemCallback? onTodoLongPressed;
+  final TodoListItemCallback? onTodoCheck;
   final List<Todo> todos;
 
   @override
@@ -25,6 +27,8 @@ class TodoListView extends StatelessWidget {
       itemBuilder:
           (context, index) => TodoListItem(
             todo: todos[index],
+            onCheck:
+                onTodoCheck != null ? () => onTodoCheck!(todos[index]) : null,
             onTap:
                 onTodoTapped != null
                     ? () => onTodoTapped!(todos[index])

@@ -3,13 +3,33 @@ import 'package:go_router/go_router.dart';
 import 'package:video_resource_go_router_todo_app/widgets/active_todos.dart';
 import 'package:video_resource_go_router_todo_app/widgets/archived_todos.dart';
 import 'package:video_resource_go_router_todo_app/widgets/bottom_navigation.dart';
+import 'package:video_resource_go_router_todo_app/widgets/todo_page.dart';
+
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class TodoRouter extends GoRouter {
   TodoRouter()
     : super.routingConfig(
         initialLocation: '/active',
         routingConfig: ValueNotifier(RoutingConfig(routes: _routes)),
+        navigatorKey: _rootNavigatorKey,
       );
+
+  void goToTodo(int id) {
+    switch (state.topRoute?.path) {
+      case '/active':
+        go('/active/$id');
+        break;
+      case '/completed':
+        go('/completed/$id');
+        break;
+      case '/archive':
+        go('/archive/$id');
+        break;
+      default:
+        go('/active/$id');
+    }
+  }
 
   void goToTodos() {
     go('/active');
@@ -57,8 +77,17 @@ final _routes = <RouteBase>[
           GoRoute(
             path: '/archive',
             pageBuilder: (context, state) {
-              return NoTransitionPage(child: TodoPage(title: 'Archive'));
+              return NoTransitionPage(child: ArchivedTodo());
             },
+            routes: [
+              GoRoute(
+                path: ':id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder:
+                    (context, state) =>
+                        TodoPage(id: int.parse(state.pathParameters['id']!)),
+              ),
+            ],
           ),
         ],
       ),
@@ -77,7 +106,6 @@ final _routes = <RouteBase>[
                 child: Tabs(
                   title: 'Todos',
                   selected: tab,
-
                   onSelected: (item) {
                     switch (item) {
                       case TabsItems.active:
@@ -89,6 +117,15 @@ final _routes = <RouteBase>[
                 ),
               );
             },
+            routes: [
+              GoRoute(
+                path: ':id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder:
+                    (context, state) =>
+                        TodoPage(id: int.parse(state.pathParameters['id']!)),
+              ),
+            ],
           ),
         ],
       ),

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 
 class Todo {
+  int id;
   String title;
   bool completed;
   bool archived;
 
-  Todo({required this.title, this.completed = false, required this.archived});
+  Todo({
+    required this.id,
+    required this.title,
+    this.completed = false,
+    required this.archived,
+  });
 }
 
 class Todos with ChangeNotifier {
@@ -18,9 +24,9 @@ class Todos with ChangeNotifier {
   }
 
   List<Todo> todos = [
-    Todo(title: 'Make lunch', completed: false, archived: false),
-    Todo(title: 'Feed dog', completed: true, archived: false),
-    Todo(title: 'Watch movie', archived: true),
+    Todo(id: 1, title: 'Make lunch', completed: false, archived: false),
+    Todo(id: 2, title: 'Feed dog', completed: true, archived: false),
+    Todo(id: 3, title: 'Watch movie', archived: true),
   ];
 
   List<Todo> get active =>
@@ -28,11 +34,6 @@ class Todos with ChangeNotifier {
   List<Todo> get archived => todos.where((todo) => todo.archived).toList();
   List<Todo> get completed =>
       todos.where((todo) => todo.completed && !todo.archived).toList();
-
-  void addTodo(String title) {
-    todos.add(Todo(title: title, archived: false));
-    notifyListeners();
-  }
 
   void toggleComplete(Todo todo) {
     todo.completed = !todo.completed;
