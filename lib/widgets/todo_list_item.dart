@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:video_resource_go_router_todo_app/data/todos.dart';
 
-class TodoListItemView extends StatelessWidget {
-  const TodoListItemView({
+class TodoListItem extends StatelessWidget {
+  const TodoListItem({
     super.key,
     required this.todo,
     required this.onTap,
@@ -16,6 +16,7 @@ class TodoListItemView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      clipBehavior: Clip.hardEdge,
       margin: EdgeInsets.all(0),
       color: ColorScheme.of(context).primaryContainer,
       elevation: 0,

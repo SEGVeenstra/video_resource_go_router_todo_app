@@ -1,10 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:video_resource_go_router_todo_app/data/todos.dart';
-import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
-import 'package:video_resource_go_router_todo_app/widgets/todo_page.dart';
-import 'package:video_resource_go_router_todo_app/widgets/todo_root_navigation_page.dart';
-import 'package:video_resource_go_router_todo_app/widgets/todo_tabbed_page.dart';
+import 'package:video_resource_go_router_todo_app/widgets/active_todos.dart';
+import 'package:video_resource_go_router_todo_app/widgets/archived_todos.dart';
+import 'package:video_resource_go_router_todo_app/widgets/bottom_navigation.dart';
 
 class TodoRouter extends GoRouter {
   TodoRouter()
@@ -37,19 +35,19 @@ extension TodoRouterExt on BuildContext {
 final _routes = <RouteBase>[
   StatefulShellRoute.indexedStack(
     builder:
-        (context, state, child) => TodoRootNavigationPage(
-          onNavbarItemSelected: (item) {
+        (context, state, child) => BottomNavigation(
+          onSelected: (item) {
             switch (item) {
-              case TodoRootNavigation.todos:
+              case BottomNavigationItems.todos:
                 context.todoRouter.goToTodos();
-              case TodoRootNavigation.archive:
+              case BottomNavigationItems.archive:
                 context.todoRouter.goToArchive();
             }
           },
           selected: switch (state.pathParameters['tab']) {
-            'active' => TodoRootNavigation.todos,
-            'completed' => TodoRootNavigation.archive,
-            _ => TodoRootNavigation.todos,
+            'active' => BottomNavigationItems.todos,
+            'completed' => BottomNavigationItems.archive,
+            _ => BottomNavigationItems.todos,
           },
           child: child,
         ),
@@ -59,15 +57,7 @@ final _routes = <RouteBase>[
           GoRoute(
             path: '/archive',
             pageBuilder: (context, state) {
-              return NoTransitionPage(
-                child: TodoPage(
-                  title: 'Archive',
-                  child: TodoListView(
-                    filter: (todo) => todo.archived,
-                    onTodoLongPressed: Todos().unarchive,
-                  ),
-                ),
-              );
+              return NoTransitionPage(child: TodoPage(title: 'Archive'));
             },
           ),
         ],
@@ -79,29 +69,20 @@ final _routes = <RouteBase>[
             path: '/:tab',
             pageBuilder: (context, state) {
               final tab = switch (state.pathParameters['tab']) {
-                'active' => TodoTabbedItem.active,
-                'completed' => TodoTabbedItem.completed,
-                _ => TodoTabbedItem.active,
+                'active' => TabsItems.active,
+                'completed' => TabsItems.completed,
+                _ => TabsItems.active,
               };
               return NoTransitionPage(
-                child: TodoTabbedPage(
+                child: Tabs(
                   title: 'Todos',
                   selected: tab,
-                  activeList: TodoListView(
-                    filter: (todo) => !todo.completed && !todo.archived,
-                    onTodoTapped: Todos().toggleComplete,
-                    onTodoLongPressed: Todos().archive,
-                  ),
-                  completedList: TodoListView(
-                    filter: (todo) => todo.completed && !todo.archived,
-                    onTodoLongPressed: Todos().archive,
-                    onTodoTapped: Todos().toggleComplete,
-                  ),
-                  onTabSelected: (item) {
+
+                  onSelected: (item) {
                     switch (item) {
-                      case TodoTabbedItem.active:
+                      case TabsItems.active:
                         context.todoRouter.goToTodos();
-                      case TodoTabbedItem.completed:
+                      case TabsItems.completed:
                         context.todoRouter.goToCompleted();
                     }
                   },
