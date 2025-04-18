@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_resource_go_router_todo_app/data/todos.dart';
 
-class TodoPage extends StatelessWidget {
-  const TodoPage({super.key, required this.id});
+class TodoDetail extends StatelessWidget {
+  const TodoDetail({super.key, required this.id});
 
   final int id;
 

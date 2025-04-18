@@ -3,8 +3,8 @@ import 'package:video_resource_go_router_todo_app/data/todos.dart';
 import 'package:video_resource_go_router_todo_app/todo_router.dart';
 import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
 
-class ArchivedTodo extends StatelessWidget {
-  const ArchivedTodo({super.key});
+class TodoArchived extends StatelessWidget {
+  const TodoArchived({super.key});
 
   @override
   Widget build(BuildContext context) {

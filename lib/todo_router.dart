@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:video_resource_go_router_todo_app/widgets/active_todos.dart';
-import 'package:video_resource_go_router_todo_app/widgets/archived_todos.dart';
-import 'package:video_resource_go_router_todo_app/widgets/bottom_navigation.dart';
-import 'package:video_resource_go_router_todo_app/widgets/todo_page.dart';
+import 'package:video_resource_go_router_todo_app/widgets/todo_active_tabs.dart';
+import 'package:video_resource_go_router_todo_app/widgets/todo_archived.dart';
+import 'package:video_resource_go_router_todo_app/widgets/todo_bottom_nav.dart';
+import 'package:video_resource_go_router_todo_app/widgets/todo_detail.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -55,19 +55,19 @@ extension TodoRouterExt on BuildContext {
 final _routes = <RouteBase>[
   StatefulShellRoute.indexedStack(
     builder:
-        (context, state, child) => BottomNavigation(
+        (context, state, child) => TodoBottomNav(
           onSelected: (item) {
             switch (item) {
-              case BottomNavigationItems.todos:
+              case TodoBottomNavItems.active:
                 context.todoRouter.goToTodos();
-              case BottomNavigationItems.archive:
+              case TodoBottomNavItems.archive:
                 context.todoRouter.goToArchive();
             }
           },
           selected: switch (state.pathParameters['tab']) {
-            'active' => BottomNavigationItems.todos,
-            'completed' => BottomNavigationItems.archive,
-            _ => BottomNavigationItems.todos,
+            'active' => TodoBottomNavItems.active,
+            'completed' => TodoBottomNavItems.archive,
+            _ => TodoBottomNavItems.active,
           },
           child: child,
         ),
@@ -77,7 +77,7 @@ final _routes = <RouteBase>[
           GoRoute(
             path: '/archive',
             pageBuilder: (context, state) {
-              return NoTransitionPage(child: ArchivedTodo());
+              return NoTransitionPage(child: TodoArchived());
             },
             routes: [
               GoRoute(
@@ -85,7 +85,7 @@ final _routes = <RouteBase>[
                 parentNavigatorKey: _rootNavigatorKey,
                 builder:
                     (context, state) =>
-                        TodoPage(id: int.parse(state.pathParameters['id']!)),
+                        TodoDetail(id: int.parse(state.pathParameters['id']!)),
               ),
             ],
           ),
@@ -103,8 +103,7 @@ final _routes = <RouteBase>[
                 _ => TabsItems.active,
               };
               return NoTransitionPage(
-                child: Tabs(
-                  title: 'Todos',
+                child: TodoActiveTabs(
                   selected: tab,
                   onSelected: (item) {
                     switch (item) {
@@ -123,7 +122,7 @@ final _routes = <RouteBase>[
                 parentNavigatorKey: _rootNavigatorKey,
                 builder:
                     (context, state) =>
-                        TodoPage(id: int.parse(state.pathParameters['id']!)),
+                        TodoDetail(id: int.parse(state.pathParameters['id']!)),
               ),
             ],
           ),

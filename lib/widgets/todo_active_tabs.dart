@@ -5,25 +5,24 @@ import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
 
 enum TabsItems { active, completed }
 
-typedef TabsItemItemSelectedCallback = void Function(TabsItems item);
+typedef TodoActiveTabsItemSelectedCallback = void Function(TabsItems item);
 
-class Tabs extends StatefulWidget {
-  const Tabs({
+class TodoActiveTabs extends StatefulWidget {
+  const TodoActiveTabs({
     super.key,
     required this.selected,
     required this.onSelected,
-    required this.title,
   });
 
   final TabsItems selected;
-  final TabsItemItemSelectedCallback onSelected;
-  final String title;
+  final TodoActiveTabsItemSelectedCallback onSelected;
 
   @override
-  State<Tabs> createState() => _TabsState();
+  State<TodoActiveTabs> createState() => _TodoActiveTabsState();
 }
 
-class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
+class _TodoActiveTabsState extends State<TodoActiveTabs>
+    with SingleTickerProviderStateMixin {
   late final _tabController = TabController(length: 2, vsync: this);
 
   @override
@@ -43,7 +42,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   }
 
   @override
-  void didUpdateWidget(covariant Tabs oldWidget) {
+  void didUpdateWidget(covariant TodoActiveTabs oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.selected != widget.selected) {
@@ -55,7 +54,7 @@ class _TabsState extends State<Tabs> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Todos'),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [Tab(text: 'Active'), Tab(text: 'Completed')],

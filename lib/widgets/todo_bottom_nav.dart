@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-enum BottomNavigationItems { todos, archive }
+enum TodoBottomNavItems { active, archive }
 
-typedef BottomNavigationItemSelectedCallback =
-    void Function(BottomNavigationItems item);
+typedef TodoBottomNavItemSelectedCallback =
+    void Function(TodoBottomNavItems item);
 
-class BottomNavigation extends StatelessWidget {
-  const BottomNavigation({
+class TodoBottomNav extends StatelessWidget {
+  const TodoBottomNav({
     super.key,
     required this.onSelected,
     required this.selected,
     required this.child,
   });
 
-  final BottomNavigationItemSelectedCallback onSelected;
-  final BottomNavigationItems selected;
+  final TodoBottomNavItemSelectedCallback onSelected;
+  final TodoBottomNavItems selected;
   final Widget child;
 
   @override
@@ -22,8 +22,8 @@ class BottomNavigation extends StatelessWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: BottomNavigationItems.values.indexOf(selected),
-        onTap: (value) => onSelected(BottomNavigationItems.values[value]),
+        currentIndex: TodoBottomNavItems.values.indexOf(selected),
+        onTap: (value) => onSelected(TodoBottomNavItems.values[value]),
         items: [
           BottomNavigationBarItem(icon: const Icon(Icons.list), label: 'Todos'),
           BottomNavigationBarItem(
