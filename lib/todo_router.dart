@@ -10,12 +10,13 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 class TodoRouter extends GoRouter {
   TodoRouter()
     : super.routingConfig(
+        navigatorKey: _rootNavigatorKey,
         initialLocation: '/active/todo',
         routingConfig: ValueNotifier(RoutingConfig(routes: _routes)),
-        navigatorKey: _rootNavigatorKey,
       );
 
-  void goToTodo() {
+  // TODO: add navigation methods
+  void goToActive() {
     go('/active/todo');
   }
 
@@ -23,20 +24,16 @@ class TodoRouter extends GoRouter {
     go('/active/completed');
   }
 
-  void goToArchive() {
-    go('/archive');
+  void goToArchivedDetail(int id) {
+    go('/archived/$id');
   }
 
-  void goToActiveTodoDetail(int id) {
+  void goToActiveDetail(int id) {
     go('/active/todo/$id');
   }
 
-  void goToCompletedTodoDetail(int id) {
+  void goToCompletedDetail(int id) {
     go('/active/completed/$id');
-  }
-
-  void goToArchiveTodoDetail(int id) {
-    go('/archive/$id');
   }
 
   static TodoRouter of(BuildContext context) {
@@ -51,17 +48,13 @@ extension TodoRouterExt on BuildContext {
 final _routes = <RouteBase>[
   StatefulShellRoute.indexedStack(
     builder:
-        (context, state, shell) => TodoBottomNav(
-          onSelected: (item) {
-            switch (item) {
-              case TodoBottomNavItems.active:
-                context.todoRouter.goToTodo();
-              case TodoBottomNavItems.archive:
-                context.todoRouter.goToArchive();
-            }
-          },
-          selected: TodoBottomNavItems.values[shell.currentIndex],
-          child: shell,
+        (context, state, navigationShell) => TodoBottomNav(
+          onSelected:
+              (item) => navigationShell.goBranch(
+                TodoBottomNavItems.values.indexOf(item),
+              ),
+          selected: TodoBottomNavItems.values[navigationShell.currentIndex],
+          child: navigationShell,
         ),
     branches: [
       StatefulShellBranch(
@@ -70,67 +63,56 @@ final _routes = <RouteBase>[
           GoRoute(
             path: '/active/:tab',
             pageBuilder: (context, state) {
-              final tab = switch (state.pathParameters['tab']) {
-                'todo' => TabsItems.active,
-                'completed' => TabsItems.completed,
-                _ => TabsItems.active,
-              };
+              final selectedItem =
+                  state.pathParameters['tab'] == 'completed'
+                      ? TabsItems.completed
+                      : TabsItems.active;
+
               return NoTransitionPage(
                 child: TodoActiveTabs(
-                  selected: tab,
-                  onSelected: (item) {
-                    switch (item) {
-                      case TabsItems.active:
-                        context.todoRouter.goToTodo();
-                      case TabsItems.completed:
-                        context.todoRouter.goToCompleted();
-                    }
-                  },
+                  selected: selectedItem,
+                  onSelected:
+                      (item) => switch (item) {
+                        TabsItems.active => context.todoRouter.goToActive(),
+                        TabsItems.completed =>
+                          context.todoRouter.goToCompleted(),
+                      },
                   onActiveTodoTapped:
-                      (todo) =>
-                          context.todoRouter.goToActiveTodoDetail(todo.id),
+                      (todo) => context.todoRouter.goToActiveDetail(todo.id),
                   onComplededTodoTapped:
-                      (todo) =>
-                          context.todoRouter.goToCompletedTodoDetail(todo.id),
+                      (todo) => context.todoRouter.goToCompletedDetail(todo.id),
                 ),
               );
             },
-            routes: [
-              GoRoute(
-                path: ':id',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder:
-                    (context, state) =>
-                        TodoDetail(id: int.parse(state.pathParameters['id']!)),
-              ),
-            ],
+            routes: [_detailPageRoute],
           ),
         ],
       ),
       StatefulShellBranch(
         routes: [
           GoRoute(
-            path: '/archive',
-            pageBuilder: (context, state) {
-              return NoTransitionPage(
-                child: TodoArchived(
-                  onTodoTapped:
-                      (todo) => context.todoRouter.go('/archive/${todo.id}'),
+            path: '/archived',
+            pageBuilder:
+                (context, state) => NoTransitionPage(
+                  child: TodoArchived(
+                    onTodoTapped:
+                        (todo) =>
+                            context.todoRouter.goToArchivedDetail(todo.id),
+                  ),
                 ),
-              );
-            },
-            routes: [
-              GoRoute(
-                path: ':id',
-                parentNavigatorKey: _rootNavigatorKey,
-                builder:
-                    (context, state) =>
-                        TodoDetail(id: int.parse(state.pathParameters['id']!)),
-              ),
-            ],
+            routes: [_detailPageRoute],
           ),
         ],
       ),
     ],
   ),
 ];
+
+final _detailPageRoute = GoRoute(
+  parentNavigatorKey: _rootNavigatorKey,
+  path: ':id',
+  builder: (context, state) {
+    final id = int.parse(state.pathParameters['id']!);
+    return TodoDetail(id: id);
+  },
+);
