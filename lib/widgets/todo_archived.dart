@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:video_resource_go_router_todo_app/data/todos.dart';
-import 'package:video_resource_go_router_todo_app/todo_router.dart';
 import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
 
 class TodoArchived extends StatelessWidget {
-  const TodoArchived({super.key});
+  const TodoArchived({super.key, this.onTodoTapped});
+
+  final void Function(Todo todo)? onTodoTapped;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class TodoArchived extends StatelessWidget {
             todos: Todos().archived,
             onTodoLongPressed: Todos().unarchive,
             onTodoCheck: Todos().toggleComplete,
-            onTodoTapped: (todo) => context.todoRouter.goToTodo(todo.id),
+            onTodoTapped: onTodoTapped,
           );
         },
       ),

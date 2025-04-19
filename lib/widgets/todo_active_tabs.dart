@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:video_resource_go_router_todo_app/data/todos.dart';
-import 'package:video_resource_go_router_todo_app/todo_router.dart';
 import 'package:video_resource_go_router_todo_app/widgets/todo_list_view.dart';
 
 enum TabsItems { active, completed }
@@ -12,10 +11,14 @@ class TodoActiveTabs extends StatefulWidget {
     super.key,
     required this.selected,
     required this.onSelected,
+    this.onActiveTodoTapped,
+    this.onComplededTodoTapped,
   });
 
   final TabsItems selected;
   final TodoActiveTabsItemSelectedCallback onSelected;
+  final void Function(Todo todo)? onActiveTodoTapped;
+  final void Function(Todo todo)? onComplededTodoTapped;
 
   @override
   State<TodoActiveTabs> createState() => _TodoActiveTabsState();
@@ -68,13 +71,13 @@ class _TodoActiveTabsState extends State<TodoActiveTabs>
             children: [
               TodoListView(
                 todos: Todos().active,
-                onTodoTapped: (todo) => context.todoRouter.goToTodo(todo.id),
+                onTodoTapped: widget.onActiveTodoTapped,
                 onTodoLongPressed: Todos().archive,
                 onTodoCheck: Todos().toggleComplete,
               ),
               TodoListView(
                 todos: Todos().completed,
-                onTodoTapped: (todo) => context.todoRouter.goToTodo(todo.id),
+                onTodoTapped: widget.onComplededTodoTapped,
                 onTodoLongPressed: Todos().archive,
                 onTodoCheck: Todos().toggleComplete,
               ),

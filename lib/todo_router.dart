@@ -10,37 +10,33 @@ final _rootNavigatorKey = GlobalKey<NavigatorState>();
 class TodoRouter extends GoRouter {
   TodoRouter()
     : super.routingConfig(
-        initialLocation: '/active',
+        initialLocation: '/active/todo',
         routingConfig: ValueNotifier(RoutingConfig(routes: _routes)),
         navigatorKey: _rootNavigatorKey,
       );
 
-  void goToTodo(int id) {
-    switch (state.topRoute?.path) {
-      case '/active':
-        go('/active/$id');
-        break;
-      case '/completed':
-        go('/completed/$id');
-        break;
-      case '/archive':
-        go('/archive/$id');
-        break;
-      default:
-        go('/active/$id');
-    }
-  }
-
-  void goToTodos() {
-    go('/active');
+  void goToTodo() {
+    go('/active/todo');
   }
 
   void goToCompleted() {
-    go('/completed');
+    go('/active/completed');
   }
 
   void goToArchive() {
     go('/archive');
+  }
+
+  void goToActiveTodoDetail(int id) {
+    go('/active/todo/$id');
+  }
+
+  void goToCompletedTodoDetail(int id) {
+    go('/active/completed/$id');
+  }
+
+  void goToArchiveTodoDetail(int id) {
+    go('/archive/$id');
   }
 
   static TodoRouter of(BuildContext context) {
@@ -55,29 +51,49 @@ extension TodoRouterExt on BuildContext {
 final _routes = <RouteBase>[
   StatefulShellRoute.indexedStack(
     builder:
-        (context, state, child) => TodoBottomNav(
+        (context, state, shell) => TodoBottomNav(
           onSelected: (item) {
             switch (item) {
               case TodoBottomNavItems.active:
-                context.todoRouter.goToTodos();
+                context.todoRouter.goToTodo();
               case TodoBottomNavItems.archive:
                 context.todoRouter.goToArchive();
             }
           },
-          selected: switch (state.pathParameters['tab']) {
-            'active' => TodoBottomNavItems.active,
-            'completed' => TodoBottomNavItems.archive,
-            _ => TodoBottomNavItems.active,
-          },
-          child: child,
+          selected: TodoBottomNavItems.values[shell.currentIndex],
+          child: shell,
         ),
     branches: [
       StatefulShellBranch(
+        initialLocation: '/active/todo',
         routes: [
           GoRoute(
-            path: '/archive',
+            path: '/active/:tab',
             pageBuilder: (context, state) {
-              return NoTransitionPage(child: TodoArchived());
+              final tab = switch (state.pathParameters['tab']) {
+                'todo' => TabsItems.active,
+                'completed' => TabsItems.completed,
+                _ => TabsItems.active,
+              };
+              return NoTransitionPage(
+                child: TodoActiveTabs(
+                  selected: tab,
+                  onSelected: (item) {
+                    switch (item) {
+                      case TabsItems.active:
+                        context.todoRouter.goToTodo();
+                      case TabsItems.completed:
+                        context.todoRouter.goToCompleted();
+                    }
+                  },
+                  onActiveTodoTapped:
+                      (todo) =>
+                          context.todoRouter.goToActiveTodoDetail(todo.id),
+                  onComplededTodoTapped:
+                      (todo) =>
+                          context.todoRouter.goToCompletedTodoDetail(todo.id),
+                ),
+              );
             },
             routes: [
               GoRoute(
@@ -92,27 +108,14 @@ final _routes = <RouteBase>[
         ],
       ),
       StatefulShellBranch(
-        initialLocation: '/active',
         routes: [
           GoRoute(
-            path: '/:tab',
+            path: '/archive',
             pageBuilder: (context, state) {
-              final tab = switch (state.pathParameters['tab']) {
-                'active' => TabsItems.active,
-                'completed' => TabsItems.completed,
-                _ => TabsItems.active,
-              };
               return NoTransitionPage(
-                child: TodoActiveTabs(
-                  selected: tab,
-                  onSelected: (item) {
-                    switch (item) {
-                      case TabsItems.active:
-                        context.todoRouter.goToTodos();
-                      case TabsItems.completed:
-                        context.todoRouter.goToCompleted();
-                    }
-                  },
+                child: TodoArchived(
+                  onTodoTapped:
+                      (todo) => context.todoRouter.go('/archive/${todo.id}'),
                 ),
               );
             },
