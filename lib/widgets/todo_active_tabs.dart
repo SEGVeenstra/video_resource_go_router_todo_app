@@ -33,8 +33,9 @@ class _TodoActiveTabsState extends State<TodoActiveTabs>
     super.initState();
 
     _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        switch (TabsItems.values.indexOf(widget.selected)) {
+      if (!_tabController.indexIsChanging &&
+          _tabController.index != _tabController.previousIndex) {
+        switch (_tabController.index) {
           case 0:
             widget.onSelected(TabsItems.active);
           case 1:
